@@ -13,7 +13,6 @@
  * Mac: make sure you have Xcode installed
  * Windows: try MinGW to get GCC
  *
- *
  * Originally created 5 December 2006
  * 2006-2013, Tod E. Kurt, http://todbot.com/blog/
  *
@@ -53,10 +52,7 @@
 
 #include "arduino-serial-lib.h"
 
-
-//
-void usage(void)
-{
+void usage(void) {
     printf("Usage: arduino-serial -b <bps> -p <serialport> [OPTIONS]\n"
     "\n"
     "Options:\n"
@@ -82,14 +78,12 @@ void usage(void)
 }
 
 //
-void error(char* msg)
-{
+void error(char* msg) {
     fprintf(stderr, "%s\n",msg);
     exit(EXIT_FAILURE);
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     const int buf_max = 256;
 
     int fd = -1;
@@ -127,82 +121,79 @@ int main(int argc, char *argv[])
     while(1) {
         opt = getopt_long (argc, argv, "hp:b:s:S:i:rFn:d:qe:t:",
                            loptions, &option_index);
-        if (opt==-1) break;
+        if (opt==-1) {break;}
         switch (opt) {
-        case '0': break;
-        case 'q':
-            quiet = 1;
-            break;
-        case 'e':
-            eolchar = optarg[0];
-            if(!quiet) printf("eolchar set to '%c'\n",eolchar);
-            break;
-        case 't':
-            timeout = strtol(optarg,NULL,10);
-            if( !quiet ) printf("timeout set to %d millisecs\n",timeout);
-            break;
-        case 'd':
-            n = strtol(optarg,NULL,10);
-            if( !quiet ) printf("sleep %d millisecs\n",n);
-            usleep(n * 1000 ); // sleep milliseconds
-            break;
-        case 'h':
-            usage();
-            break;
-        case 'b':
-            baudrate = strtol(optarg,NULL,10);
-            break;
-        case 'p':
-            if( fd!=-1 ) {
-                serialport_close(fd);
-                if(!quiet) printf("closed port %s\n",serialport);
-            }
-            strcpy(serialport,optarg);
-            fd = serialport_init(optarg, baudrate);
-            if( fd==-1 ) error("couldn't open port");
-            if(!quiet) printf("opened port %s\n",serialport);
-            serialport_flush(fd);
-            break;
-        case 'n':
-            if( fd == -1 ) error("serial port not opened");
-            n = strtol(optarg, NULL, 10); // convert string to number
-            rc = serialport_writebyte(fd, (uint8_t)n);
-            if(rc==-1) error("error writing");
-            break;
-        case 'S':
-        case 's':
-            if( fd == -1 ) error("serial port not opened");
-            sprintf(buf, (opt=='S' ? "%s\n" : "%s"), optarg);
-
-            if( !quiet ) printf("send string:%s\n", buf);
-            rc = serialport_write(fd, buf);
-            if(rc==-1) error("error writing");
-            break;
-        case 'i':
-            rc=-1;
-            if( fd == -1) error("serial port not opened");
-            while(fgets(buf, buf_max, stdin)) {
-                if( !quiet ) printf("send string:%s\n", buf);
+            case '0': break;
+            case 'q':
+                quiet = 1;
+                break;
+            case 'e':
+                eolchar = optarg[0];
+                if(!quiet) printf("eolchar set to '%c'\n",eolchar);
+                break;
+            case 't':
+                timeout = strtol(optarg,NULL,10);
+                if( !quiet ) printf("timeout set to %d millisecs\n",timeout);
+                break;
+            case 'd':
+                n = strtol(optarg,NULL,10);
+                if( !quiet ) printf("sleep %d millisecs\n",n);
+                usleep(n * 1000 ); // sleep milliseconds
+                break;
+            case 'h':
+                usage();
+                break;
+            case 'b':
+                baudrate = strtol(optarg,NULL,10);
+                break;
+            case 'p':
+                if ( fd!=-1 ) {
+                    serialport_close(fd);
+                    if(!quiet) printf("closed port %s\n",serialport);
+                }
+                strcpy(serialport,optarg);
+                fd = serialport_init(optarg, baudrate);
+                if( fd==-1 ) error("couldn't open port");
+                if(!quiet) printf("opened port %s\n",serialport);
+                serialport_flush(fd);
+                break;
+            case 'n':
+                if( fd == -1 ) error("serial port not opened");
+                n = strtol(optarg, NULL, 10); // convert string to number
+                rc = serialport_writebyte(fd, (uint8_t)n);
+                if (rc==-1) { error("error writing"); }
+                break;
+            case 'S':
+            case 's':
+                if ( fd == -1 ) { error("serial port not opened"); }
+                sprintf(buf, (opt=='S' ? "%s\n" : "%s"), optarg);
+                if ( !quiet ) { printf("send string:%s\n", buf); }
                 rc = serialport_write(fd, buf);
-            }
-            if(rc==-1) error("error writing");
-            break;
-        case 'r':
-            if( fd == -1 ) error("serial port not opened");
-            memset(buf,0,buf_max);  //
-            serialport_read_until(fd, buf, eolchar, buf_max, timeout);
-            if( !quiet ) printf("read string:");
-            printf("%s\n", buf);
-            break;
-        case 'F':
-            if( fd == -1 ) error("serial port not opened");
-            if( !quiet ) printf("flushing receive buffer\n");
-            serialport_flush(fd);
-            break;
-
+                if(rc==-1) error("error writing");
+                break;
+            case 'i':
+                rc=-1;
+                if ( fd == -1) { error("serial port not opened"); }
+                while(fgets(buf, buf_max, stdin)) {
+                    if( !quiet ) printf("send string:%s\n", buf);
+                    rc = serialport_write(fd, buf);
+                }
+                if (rc==-1) { error("error writing"); }
+                break;
+            case 'r':
+                if ( fd == -1 ) { error("serial port not opened"); }
+                memset(buf,0,buf_max);  //
+                serialport_read_until(fd, buf, eolchar, buf_max, timeout);
+                if( !quiet ) printf("read string:");
+                printf("%s\n", buf);
+                break;
+            case 'F':
+                if( fd == -1 ) error("serial port not opened");
+                if( !quiet ) printf("flushing receive buffer\n");
+                serialport_flush(fd);
+                break;
         }
     }
 
     exit(EXIT_SUCCESS);
 } // end main
-

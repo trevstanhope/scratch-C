@@ -21,8 +21,8 @@
 // and a baud rate (bps) and connects to that port at that speed and 8N1.
 // opens the port in fully raw mode so you can send binary data.
 // returns valid fd, or -1 on error
-int serialport_init(const char* serialport, int baud)
-{
+int serialport_init(const char* serialport, int baud) {
+
     struct termios toptions;
     int fd;
     
@@ -46,13 +46,13 @@ int serialport_init(const char* serialport, int baud)
     switch(baud) {
     case 4800:   brate=B4800;   break;
     case 9600:   brate=B9600;   break;
-#ifdef B14400
-    case 14400:  brate=B14400;  break;
-#endif
-    case 19200:  brate=B19200;  break;
-#ifdef B28800
-    case 28800:  brate=B28800;  break;
-#endif
+    #ifdef B14400
+        case 14400:  brate=B14400;  break;
+    #endif
+        case 19200:  brate=B19200;  break;
+    #ifdef B28800
+        case 28800:  brate=B28800;  break;
+    #endif
     case 38400:  brate=B38400;  break;
     case 57600:  brate=B57600;  break;
     case 115200: brate=B115200; break;
@@ -90,24 +90,21 @@ int serialport_init(const char* serialport, int baud)
     return fd;
 }
 
-//
-int serialport_close( int fd )
-{
+// Close port
+int serialport_close( int fd ) {
     return close( fd );
 }
 
-//
-int serialport_writebyte( int fd, uint8_t b)
-{
+// Write byte
+int serialport_writebyte( int fd, uint8_t b) {
     int n = write(fd,&b,1);
     if( n!=1)
         return -1;
     return 0;
 }
 
-//
-int serialport_write(int fd, const char* str)
-{
+// Write string
+int serialport_write(int fd, const char* str) {
     int len = strlen(str);
     int n = write(fd, str, len);
     if( n!=len ) {
@@ -117,9 +114,8 @@ int serialport_write(int fd, const char* str)
     return 0;
 }
 
-//
-int serialport_read_until(int fd, char* buf, char until, int buf_max, int timeout)
-{
+// Read port
+int serialport_read_until(int fd, char* buf, char until, int buf_max, int timeout) {
     char b[1];  // read expects an array, so we give it a 1-byte array
     int i=0;
     do { 
@@ -130,20 +126,19 @@ int serialport_read_until(int fd, char* buf, char until, int buf_max, int timeou
             timeout--;
             continue;
         }
-#ifdef SERIALPORTDEBUG  
-        printf("serialport_read_until: i=%d, n=%d b='%c'\n",i,n,b[0]); // debug
-#endif
+        #ifdef SERIALPORTDEBUG  
+            printf("serialport_read_until: i=%d, n=%d b='%c'\n",i,n,b[0]); // debug
+        #endif
         buf[i] = b[0]; 
         i++;
-    } while( b[0] != until && i < buf_max && timeout>0 );
+    } while ( b[0] != until && i < buf_max && timeout>0 );
 
     buf[i] = 0;  // null terminate the string
     return 0;
 }
 
-//
-int serialport_flush(int fd)
-{
+// Flush port
+int serialport_flush(int fd) {
     sleep(2); //required to make flush work, for some reason
     return tcflush(fd, TCIOFLUSH);
 }
