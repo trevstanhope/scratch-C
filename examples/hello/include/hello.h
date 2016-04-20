@@ -2,5 +2,6 @@
  * example include file
 */
 
-void some_function(int);
-void other_function(int);
+#define CHECKSUM 256
+
+int checksum(char*, int);
