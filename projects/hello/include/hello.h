@@ -1,6 +1,6 @@
 /*
- * example include file
-*/
+ * Header File
+ */
 
 #define CHECKSUM 256
 

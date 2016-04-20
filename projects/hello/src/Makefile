@@ -1,16 +1,14 @@
 IDIR =../include
 CC=gcc
-CFLAGS=-I$(IDIR)
-
+CFLAGS=-I$(IDIR) -std=c11
 ODIR=obj
 LDIR =../lib
-
 LIBS=-lm
-
 _DEPS = hello.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
-_OBJ = hello.o hello.o
+_OBJ = hello.o checksum.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 hello: $(OBJ)
